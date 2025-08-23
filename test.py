@@ -8,23 +8,12 @@ from model import GAT
 import torch.nn.functional as F 
 
 def load_gat_model(model_path="gat_model.pt", weights_only=False):
-    """
-    Load the trained GAT model from a file.
-    :param model_path: File path to the saved model.
-    :return: Loaded GAT model.
-    """
     model = torch.load(model_path, weights_only=False)
     model.eval()
     print(f"Model loaded from {model_path}")
     return model
 
 def select_random_images(feature_embeddings, num_samples=10):
-    """
-    Select random images (or products) from the feature embeddings.
-    :param feature_embeddings: Numpy array or tensor of image embeddings.
-    :param num_samples: Number of random samples to select.
-    :return: Indices and selected embeddings.
-    """
     random.seed(42)
     num_images = feature_embeddings.shape[0]
     random_indices = random.sample(range(num_images), num_samples)
@@ -32,26 +21,12 @@ def select_random_images(feature_embeddings, num_samples=10):
     return random_indices, selected_embeddings
 
 def get_recommendations(model, graph_data, selected_indices):
-    """
-    Use the trained GAT model to get recommendations for selected images/products.
-    :param model: Trained GAT model.
-    :param graph_data: PyG Data object containing graph data.
-    :param selected_indices: Indices of the selected images/products.
-    :return: Predicted recommendations for each selected image/product.
-    """
     with torch.no_grad():
         predictions = model(graph_data)
         recommended_indices = predictions[selected_indices].topk(5, dim=1).indices 
     return recommended_indices
 
 def visualize_recommendations(selected_indices, recommendations, image_directory, filenames, save_dir="clustering_recs"):
-    """
-    Visualize the selected images and their recommendations.
-    :param selected_indices: List of indices for the selected query images.
-    :param recommendations: List of recommended indices for each query image.
-    :param image_directory: Directory where images are stored.
-    :param filenames: List of image filenames corresponding to embeddings.
-    """
     os.makedirs(save_dir, exist_ok=True)
 
     for i, query_idx in enumerate(selected_indices):
